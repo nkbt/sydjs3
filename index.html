@@ -1,0 +1,174 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=1024"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>SydJS - Truly modular AngularJS</title>
+
+  <meta name="description"
+    content="Sneak peek on building and testing modular AngularJS application with Webpack"/>
+  <meta name="author" content="Nik Butenko"/>
+
+  <link
+    href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|PT+Sans:400,700,400italic,700italic|PT+Serif:400,700,400italic,700italic"
+    rel="stylesheet"/>
+
+  <link href="css/impress-demo.css" rel="stylesheet"/>
+
+  <link rel="shortcut icon" href="favicon.png"/>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="css/highlight/tomorrow-night-eighties.css">
+</head>
+
+<body class="impress-not-supported">
+
+
+<div class="fallback-message">
+  <p>Your browser <b>doesn't support the features required</b> by impress.js, so you are presented
+    with a simplified version of this presentation.</p>
+
+  <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b>
+    browser.</p>
+</div>
+
+<div id="impress" data-transition-duration="500">
+
+<div id="title" class="title step" data-x="0" data-y="0" data-scale="1">
+  <p class="try">Truly modular AngularJS</p>
+
+  <p>Sneak peek on building and testing modular AngularJS application with Webpack</p>
+
+  <div class="footnote">
+    <p>Sydney, 17th December 2014</p>
+
+    <p>Nik Butenko</p>
+  </div>
+</div>
+
+<div id="thanks" class="title step" data-x="0" data-y="10000" data-rotate-x="90"
+  data-rotate-y="90" data-scale="3">
+
+  <h2>Thanks!</h2>
+
+  <br/>
+  <div style="text-align: center;">
+    <img src="qr.png" style="width: 80%;" alt=""/>
+  </div>
+
+  <p>
+    <a href="https://github.com/packetloop/angular-webpack" target="_blank" style="white-space: nowrap">
+      https://github.com/packetloop/angular-webpack
+    </a>
+  </p>
+  <img src="nyantocat.gif" style="position: absolute; right: 50px; bottom: 50px; width: 100px; border-radius: 50px;" alt=""/>
+</div>
+
+
+<div id="overview" class="step" data-x="2200" data-y="3000" data-scale="10">
+</div>
+
+</div>
+
+<ul id="nav">
+</ul>
+
+<script type="text/javascript" src="js/impress.js"></script>
+<script type="text/javascript" src="js/highlight.pack.js"></script>
+
+<script>
+
+  (function () {
+
+    var codes = {},
+      timers = {};
+
+    function typeText(id, $element, callback) {
+      var TIMEOUT = 3,
+        code;
+      if (!!timers[id]) {
+        clearTimeout(timers[id]);
+        timers[id] = null;
+      }
+      if (!codes[id]) {
+        codes[id] = $element.innerText.trim();
+      }
+      code = codes[id].split('');
+      $element.innerHTML = '';
+      $element.style.display = 'block';
+
+      function typeChar() {
+        if (code.length < 1) {
+          return callback();
+        }
+        var char = code.shift();
+        if (char === '\t') {
+          char = '  ';
+        }
+        $element.innerHTML = [$element.innerHTML, char].join('');
+        timers[id] = setTimeout(
+          typeChar,
+          (char === '\n') ?
+          TIMEOUT * 10 + TIMEOUT * 40 * Math.random() :
+          TIMEOUT + TIMEOUT * 4 * Math.random()
+        );
+      }
+
+      return typeChar();
+    }
+
+    function processScript($script) {
+      var $pre,
+        $code;
+      $pre = document.createElement('pre');
+      $code = document.createElement('code');
+      $code.classList.add('hljs');
+      $code.classList.add($script.dataset.lang);
+      $code.innerText = $script.innerText.trim();
+      $pre.appendChild($code);
+
+      $script.parentNode.replaceChild($pre, $script);
+
+      return $code;
+    }
+
+    document.body.addEventListener("impress:stepenter", function (event) {
+      return Array.prototype.slice.apply(event.target.querySelectorAll('script[data-lang]'))
+        .map(processScript)
+        .forEach(function ($code, index) {
+          return typeText([event.target.id, index].join('-'), $code, function () {
+            hljs.highlightBlock($code);
+          });
+        });
+    }, false);
+
+    Array.prototype.slice.apply(document.querySelectorAll('[id].step')).forEach(function ($element) {
+      var $a = document.createElement('a'),
+        $li = document.createElement('li'),
+        $h = $element.querySelector('h2, h3');
+      $li.appendChild($a);
+      $a.title = $h && $h.innerHTML || $element.id;
+      $a.dataset.id = $element.id;
+      $a.href = ['#', $element.id].join('');
+      $a.innerHTML = $element.id;
+      return document.querySelector('#nav').appendChild($li);
+    });
+
+    document.body.addEventListener("impress:stepenter", function (event) {
+      Array.prototype.slice.apply(document.querySelectorAll('#nav a')).forEach(function ($a) {
+        if ($a.dataset.id === event.target.id) {
+          $a.classList.add('active');
+        } else {
+          $a.classList.remove('active');
+        }
+      });
+    }, false);
+
+
+    impress().init();
+  }());
+</script>
+</body>
+</html>
